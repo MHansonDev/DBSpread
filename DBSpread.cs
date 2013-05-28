@@ -49,22 +49,38 @@ public class DBaseSpread
             Console.WriteLine(e.ToString());
         }
 
-        // Create Excel Spreadsheet;
+        // Create Excel Spreadsheet
         xlApp = new Excel.Application();
         xlWorkbook = xlApp.Workbooks.Add(Missing.Value);
         xlWorksheet = (Excel.Worksheet)xlWorkbook.Sheets[1];
 
-        // Get Product Data
+        // Set Spreadsheet Headings
+        string[] headings = {"Name", "Number", "Color", "Cost"};
+        for (int i = 1; i <= headings.Length; i++)
+        {
+            xlWorksheet.Cells[1, i] = headings[i - 1];
+            Excel.Range headRange = xlWorksheet.Cells[1, i];
+            headRange.Font.Bold = true;
+        }
+
+        // Pull/Write Product Data
         try
         {
             SqlDataReader productReader = null;
             SqlCommand getProducts = new SqlCommand("SELECT *" +
                                                     "FROM SalesLT.Product", dbConn);
             productReader = getProducts.ExecuteReader();
-            int rowCount = 1;
+            int rowCount = 2;
             while (productReader.Read())
             {
+                // Add Product Name
                 xlWorksheet.Cells[rowCount, 1] = productReader["Name"].ToString();
+                // Add Product Number
+                xlWorksheet.Cells[rowCount, 2] = productReader["ProductNumber"].ToString();
+                // Add Product Color
+                xlWorksheet.Cells[rowCount, 3] = productReader["Color"].ToString();
+                // Add Product Cost
+                xlWorksheet.Cells[rowCount, 4] = productReader["StandardCost"].ToString();
                 rowCount++;
             }
         }
